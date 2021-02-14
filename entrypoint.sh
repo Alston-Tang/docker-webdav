@@ -8,11 +8,19 @@ else
     sed -i 's%auth_basic_user_file webdavpasswd;% %g' /etc/nginx/nginx.conf
 fi
 
+if [ ! -n "${WEBDAV_PORT:-}" ]; then
+    WEBDAV_PORT=8080
+fi
+
+echo "Listen to port ${WEBDAV_PORT}"
+sed -i "s%listen 8080 default_server;%listen ${WEBDAV_PORT} default_server;%g" /etc/nginx/nginx.conf
+
+cat /etc/nginx/nginx.conf
+	    
+
 if [ -n "${UID:-}" ]; then
     chmod go+w /dev/stderr /dev/stdout
-    gosu $UID mkdir -p /media/.tmp
     exec gosu $UID "$@"
 else
-    mkdir -p /media/.tmp
     exec "$@"
 fi
